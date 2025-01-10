@@ -7,15 +7,8 @@ Il est nécessaire d'utiliser un arduino pour le test de la CI.
 
 ## Images
 
-Create CI
-![image](./screenshots/create.png)
+![image](./screenshot/main.png)
 
-//newline
+![image](./screenshot/create.png)
 
-Edit CI
-![image](./screenshots/edit.png)
-
-//newline
-
-Test CI
-![image](./screenshots/test.png)
+![image](./screenshot/probe.png)
