@@ -16,6 +16,7 @@ export default defineNuxtConfig({
   devServer: { host: process.env.TAURI_DEV_HOST || 'localhost' },
 
   vite: {
+    optimizeDeps: { esbuildOptions: { target: "esnext" } },
     // Better support for Tauri CLI output
     clearScreen: false,
     // Enable environment variables
