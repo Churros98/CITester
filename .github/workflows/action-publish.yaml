@@ -71,10 +71,3 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
-
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ./src-tauri/target/release/bundle/dmg
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ github.ref }}
