@@ -17,10 +17,18 @@ pub fn run() {
             description: "create_initial_tables",
             sql: "CREATE TABLE chips (id INTEGER PRIMARY KEY, name TEXT, frames LONGTEXT);",
             kind: tauri_plugin_sql::MigrationKind::Up,
+
+        },
+        Migration {
+            version: 2,
+            description: "create_settings_table",
+            sql: "CREATE TABLE settings (id INTEGER PRIMARY KEY, name TEXT, value LONGTEXT); INSERT INTO settings (name, value) VALUES ('probe_pin_assignment', '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]');",
+            kind: tauri_plugin_sql::MigrationKind::Up,
         }
     ];
 
     tauri::Builder::default()
+
         .setup(|app| {
             app.manage(Mutex::new(AppState {
                 port: None

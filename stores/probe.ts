@@ -1,8 +1,9 @@
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import type { Frame, SerialPortInfo, TauriSerialPortInfo } from '../utils/probe';
+import { useDatabaseStore } from './database';
 
 export const useProbeStore = defineStore('probe', () => {
-    const PHY_PINS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+    const database = useDatabaseStore();
 
     let write = (data: string): Promise<void> => { throw new Error("Not initialized"); };
     let read = (length: number): Promise<string> => { throw new Error("Not initialized"); };
@@ -33,31 +34,37 @@ export const useProbeStore = defineStore('probe', () => {
         await write(`S${pin}:O\n`);
         let data = await read(4);
         console.log(`S${pin}:O -> (${data})`);
-        return data.trim() == "OK";  
+        return data.trim().includes("OK");  
     };
+
 
     const to_input = async (pin: number) => {
         await write(`S${pin}:I\n`);
         let data = await read(4);
         console.log(`S${pin}:I -> (${data})`);
-        return data.trim() == "OK";
+        return data.trim().includes("OK");
     };
     
+
     const set_output = async (pin: number, value: boolean) => {
         await write(`W${pin}:${value ? "T" : "F"}\n`);
         let data = await read(4);
         console.log(`W${pin}:${value ? "T" : "F"} -> (${data})`);
-        return data.trim() == "OK";
+        return data.trim().includes("OK");
+
     };
 
     const read_input = async (pin: number) => {
         await write(`R${pin}\n`);
         let data = await read(3);
         console.log(`R${pin}: (${data})`);
-        return data.trim() == "T";
+        return data.trim().includes("T");
     };
 
+
     const launch_test = async (frames_to_test: Frame[]) => {
+        const PHY_PINS= await database.getSettings('probe_pin_assignment');
+
         let frames_received: Frame[] = [];
     
         // Je prépare la structure des frames reçues
@@ -66,7 +73,7 @@ export const useProbeStore = defineStore('probe', () => {
 
             // Je récupére les valeurs des pins quand c'est un output (pas de raison de les tester)
             frame.ios.forEach((io, index) => {
-                if (io == false) {
+                if (!io) { // False = output
                     pins[index] = frame.pins[index];
                 }
             });
@@ -75,26 +82,28 @@ export const useProbeStore = defineStore('probe', () => {
         });
 
         // Je test frame par frame
-        for (let index = 0; index < frames_to_test.length; index++) {
-            const frame = frames_to_test[index];
+        for (let frame_number = 0; frame_number < frames_to_test.length; frame_number++) {
+            const frame = frames_to_test[frame_number];
             // Je définis les I/O et les valeurs de sortie
-            console.log(`Frame ${index + 1} of ${frames_to_test.length}`);
+            console.log(`Frame ${frame_number + 1} of ${frames_to_test.length}`);
 
-            console.log(`Definition des I/O et des valeurs de sortie`);
+
+            console.log(`Définition des I/O et des valeurs de sortie`);
             for (let i = 0; i < frame.ios.length; i++) {
                 if (frame.ios[i] == true) {
                     await to_input(PHY_PINS[i]);
+
                 } else {
                     await to_output(PHY_PINS[i]);
                     await set_output(PHY_PINS[i], frame.pins[i]);
                 }
             }
 
-            console.log(`Lecture des valeurs d'entrée`);
+            console.log(`Lecture des valeurs d'entrées`);
             // Je lit les valeurs d'entrée
-            for (let i = 0; i < frame.ios.length; i++) {
-                if (frame.ios[i] == true) {
-                    frames_received[index].pins[i] = await read_input(PHY_PINS[i]);
+            for (let pin_number = 0; pin_number < frame.ios.length; pin_number++) {
+                if (frame.ios[pin_number] == true) { // True = input
+                    frames_received[frame_number].pins[pin_number] = await read_input(PHY_PINS[pin_number]);
                 }
             }
         }

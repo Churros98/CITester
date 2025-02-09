@@ -29,16 +29,17 @@ onMounted(async () => {
 });
 </script>
 
+
 <template>
     <div class="bg-[#003161] h-screen text-white w-full">
-        <Header title="Select probe" />
+        <Header title="Sélectionner une sonde" />
 
         <!-- Mets le bloc au centre de la page-->
         <div class="flex items-center justify-center h-screen">
             <div class="flex flex-col items-center justify-center gap-3">
                 <h1 class="text-2xl font-bold w-full text-center p-4">Sondes disponibles</h1>
 
-                <div v-if="availablePorts.length > 0" class="flex flex-col items-center justify-center gap-3">
+                <div v-if="availablePorts.length > 0" class="flex flex-col items-center justify-center gap-3 overflow-y-auto">
                     <button v-for="port in availablePorts" :key="port.port_name" class="bg-white text-black p-2 rounded-md flex items-center gap-2" @click="changeProbe(port)"><Icon name="mdi:usb" />{{ port.port_name }}</button>
                 </div>
                 <h2 v-else class="text-2xl font-bold w-full text-center p-4">Aucune sonde trouvée</h2>

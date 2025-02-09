@@ -20,6 +20,10 @@ const props = defineProps<{
 
     <!-- Bouton à droite-->
     <div class="gap-2 flex justify-end px-5">
+      <button class="flex items-center" @click="navigateTo('/settings')">
+        <Icon name="mdi:settings" />
+      </button>
+  
       <button class="flex items-center" @click="navigateTo('/probe')">
         <Icon v-if="(probe.usedPort?.port_type.toString() === 'UsbPort')" name="mdi:usb" />
         <Icon v-else-if="(probe.usedPort?.port_type.toString() === 'BluetoothPort')" name="mdi:bluetooth" />
@@ -30,3 +34,4 @@ const props = defineProps<{
     </div>
   </div>
 </template>
+

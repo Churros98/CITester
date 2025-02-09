@@ -38,6 +38,8 @@ const backToMain = () => {
 
 const runTest = async (frames: Frame[]) => {
     const { frames_received: frames_received_result, error: error_result } = await probe.launch_test(frames);
+
+    console.log(frames_received_result);
     return { frames: frames_received_result, isbroken: error_result };
 }
 
@@ -95,9 +97,11 @@ onMounted(() => {
                         <Chip :editable="false" :frame="chip_to_test.frames[frame_number]" />
                         <p class="text-xl">Attendue</p>
                     </div>
+
                     <div class="flex flex-col items-center justify-center">
                         <Chip :editable="false" :frame="frames_received[frame_number]" />
                         <p class="text-xl">Reçue</p>
+
                     </div>
                 </div>
             </div>
